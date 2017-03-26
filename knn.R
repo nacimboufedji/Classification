@@ -104,9 +104,9 @@ dist_same_matrix <- function(matrix,dist_name){
 
 
 k_nn <- function(learnSet,learnLabel,testSet,vec_k,test_type,dist_name){
-
+  
   dist_matrix <- matrix()
-
+  
   if(test_type =="apprentissage" || test_type =="cross_validation" ){
     dist_matrix <- dist_same_matrix(learnSet,dist_name)
   }else{
@@ -121,7 +121,7 @@ k_nn <- function(learnSet,learnLabel,testSet,vec_k,test_type,dist_name){
   
   for(i in 1:n)
     dist_matrix[i,] <- order(dist_matrix[i,])
-    
+  
   if(test_type == "cross_validation")
     dist_matrix <- dist_matrix[,2:length(dist_matrix[1,])]
   
@@ -133,7 +133,7 @@ k_nn <- function(learnSet,learnLabel,testSet,vec_k,test_type,dist_name){
   
   #countClass count the occurence of class for a certain k 
   countClass <- c() 
-
+  
   for(i in 1:n){
     for(x in levelsClass)
       countClass [x] <- 0
@@ -143,7 +143,13 @@ k_nn <- function(learnSet,learnLabel,testSet,vec_k,test_type,dist_name){
       for(k in j:vec_k[l]){
         countClass[learnLabel[dist_matrix[i,k]]] <- countClass[learnLabel[dist_matrix[i,k]]] + 1
       }
-      matrix_k [i,l] <- names(which.max(countClass))
+      
+      x <- which(countClass == max(countClass))
+      if(length(x)>1)
+        matrix_k [i,l] <- names(sample(x,1))
+      else
+        matrix_k [i,l] <- names(x)
+      #names(which.max(countClass))
       j <- vec_k[l] + 1
     }
   }
@@ -161,7 +167,7 @@ right_class <- function (matrix,label){
   
   for(i in 1:length(matrix[1,]))
     right_class[i] <- 0
-      
+  
   for(i in 1:length(matrix[1,])){
     for(j in 1:length(matrix[,1])){
       if(matrix[j,i] == label[j] )
@@ -173,7 +179,7 @@ right_class <- function (matrix,label){
   return(right_class)
 }
 
-k=c(1,2,5,8,10,15,20,25,40,43,45)
+k=c(1,2,5,10,20,40)
 apprentissage <- k_nn(learningSet,learningLabel,testSet,k,test_type ="apprentissage",dist_name="Eucludean")
 test <- k_nn(learningSet,learningLabel,testSet,k,test_type ="test",dist_name="Eucludean")
 cross_validation <- k_nn(learningSet,learningLabel,testSet,k,test_type ="cross_validation",dist_name="Eucludean")
@@ -193,16 +199,19 @@ plot(x, y1, type = "n", ylim = range(c(y1, y2, y3)), xlab = "parametre K", ylab 
 lines(x, y1, col = "blue")
 lines(x, y2, col = "green")
 lines(x, y3, col = "red")
-legend(20, 99, legend=c("apprentissage rate", "test rate","cross validation rate"),
+legend(27, 99, legend=c("apprentissage rate", "test rate","cross validation rate"),
        col=c("blue", "green","red"), lty=1, cex=0.7)
 
-"""
+
 install.packages(class)
 library(class)
 
-for(i in 1:length(k) ){
-x <- knn(learningSet, learningSet, learningLabel, k = k[i], l = 0, prob = FALSE, use.all = TRUE)
-print(right_class(as.matrix(x),learningLabel))}
 
-print(y1)
-"""
+
+#for(i in 1:length(k) ){
+#x <- knn(learningSet, testSet, learningLabel, k = k[i], l = 0, prob = FALSE, use.all = TRUE)
+#print(right_class(as.matrix(x),testLabel))}
+
+#print(y2)
+
+#print(class(testLabel[1]))
